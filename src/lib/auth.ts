@@ -31,7 +31,7 @@ export async function signIn(email:string,password:string) {
 }
 async function staffRole(id:string):Promise<Staff> {
   const {data,error}=await supabaseAdmin().from("cine_staff").select("role").eq("user_id",id).single();
-  if(error || !data || !["admin","door"].includes(data.role)) throw new AppError("FORBIDDEN","Esta cuenta no tiene acceso al equipo de Cine CEFINF.",403);
+  if(error || !data || !["admin","door"].includes(data.role)) throw new AppError("FORBIDDEN","Esta cuenta no tiene acceso al equipo de INFOCINE.",403);
   return {id,role:data.role};
 }
 export async function requireStaff(adminOnly=false):Promise<Staff> {

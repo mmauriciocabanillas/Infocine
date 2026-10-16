@@ -6,4 +6,5 @@ export async function api<T>(path:string,options?:{method?:string;body?:unknown}
   return data;
 }
 export function message(error:unknown) { return error instanceof Error ? error.message : "No pudimos conectar. Revisa tu conexión e intenta nuevamente."; }
-export function parseQR(value:string) { const clean=value.trim().replace(/^CINECEFINF:/i,"");if(!/^[a-f0-9]{64}$/.test(clean)) throw new Error("El código no es una entrada de Cine CEFINF.");return clean; }
+// Los QR de la marca anterior conservan el mismo token de entrada.
+export function parseQR(value:string) { const clean=value.trim().replace(/^(?:INFOCINE|CINECEFINF):/i,"");if(!/^[a-f0-9]{64}$/.test(clean)) throw new Error("El código no es una entrada de INFOCINE.");return clean; }

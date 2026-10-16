@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="900" viewBox="0 0 900 900" role="img" aria-label="Logo oficial INFOCINE: boleto negro sobre círculo crema, fondo transparente">
+  <defs>
+    <clipPath id="recorte-circular">
+      <circle cx="450" cy="450" r="442"/>
+    </clipPath>
+  </defs>
+  <!-- Solo las formas visibles tienen relleno; lo demás es transparente. -->
+  <circle cx="450" cy="450" r="442" fill="#FBF1DB"/>
+  <g clip-path="url(#recorte-circular)">
+    <!-- Boleto de cine, con muesca superior y laterales suavizados. -->
+    <path fill="#000000" d="
+      M 270 198
+      C 276 174, 298 157, 323 163
+      L 397 184
+      C 391 247, 426 295, 482 311
+      C 540 329, 602 295, 625 243
+      L 697 263
+      C 721 270, 736 289, 730 318
+      L 698 444
+      C 681 437, 670 434, 661 442
+      C 647 451, 648 465, 657 473
+      C 664 480, 676 482, 685 481
+      L 578 873
+      L 516 1100
+      L 40 1100
+      L 129 751
+      L 229 362
+      C 241 366, 259 372, 268 368
+      C 281 364, 281 350, 275 340
+      C 267 329, 255 326, 240 326
+      Z"/>
+    <!-- Perforaciones de la línea de desprendimiento. -->
+    <g fill="#FBF1DB" transform="rotate(15 450 450)">
+      <ellipse cx="316.5" cy="401.5" rx="29.5" ry="21.5"/>
+      <ellipse cx="407.5" cy="401.5" rx="29.5" ry="21.5"/>
+      <ellipse cx="496.5" cy="401.5" rx="29.5" ry="21.5"/>
+      <ellipse cx="586.0" cy="401.5" rx="29.5" ry="21.5"/>
+    </g>
+  </g>
+</svg>

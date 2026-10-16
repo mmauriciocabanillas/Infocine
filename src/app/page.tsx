@@ -1,12 +1,69 @@
+import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, ArrowUpRight, CalendarDays, Clock3, MapPin, Ticket, ScanLine, Armchair } from "lucide-react";
-import { Header, Footer,LocalNotice } from "@/components/brand";
-export default function Home(){return <><Header active="funcion"/><LocalNotice mode={process.env.DATA_BACKEND}/><main id="contenido">
-  <section className="hero" id="funcion"><div className="hero-copy"><div className="eyebrow"><span/> EL CINE NOS VUELVE A REUNIR</div><p className="hero-pretitle">Una última misión.<br/>Una sala para vivirla juntos.</p><h1>AVENGERS<span>ENDGAME</span></h1><p className="hero-description">La historia que marcó una generación, de vuelta en pantalla grande. Esta vez, con toda la comunidad de Informática.</p>
-    <div className="hero-meta"><div><CalendarDays size={18}/><span>Viernes 23 de octubre<small>2026</small></span></div><div><Clock3 size={18}/><span>4:30 p. m.<small>Hora de la función</small></span></div><div className="venue"><MapPin size={18}/><span>Auditorio de Ciencias Sociales<small>Universidad Nacional de Trujillo</small></span></div></div>
-    <div className="hero-cta"><Link className="button gold" href="/reservar/endgame-2026">Elegir mis butacas <ArrowUpRight size={19}/></Link><div className="hero-price"><b>S/ 5</b><span>por entrada · paga al ingresar</span></div></div><p className="hero-footnote"><Ticket size={14}/> Reserva gratis. Recibe un QR por cada butaca.</p>
-  </div><div className="hero-art"><div className="poster-frame"><img src="/images/afiche.jpg" alt="Afiche original Cine CEFINF: Avengers Endgame, viernes 23 de octubre, 4:30 p. m., entrada S/ 5" fetchPriority="high"/><span className="poster-tag">FUNCIÓN ESPECIAL <span>01 / 2026</span></span></div><span className="art-caption">CENTRO FEDERADO DE INFORMÁTICA</span></div><div className="hero-number" aria-hidden="true">23.10</div></section>
-  <div className="feature-strip"><span><Armchair size={19}/>198 butacas numeradas</span><i/><span><Ticket size={19}/>Tu lugar, tu entrada</span><i/><span><ScanLine size={19}/>Acceso con QR</span><i/><span>Hecho para vivirlo juntos <ArrowUpRight size={16}/></span></div>
-  <section className="how-section"><div className="section-heading"><div><p className="eyebrow">TU PLAN, EN TRES PASOS</p><h2>De la reserva<br/>a la primera escena.</h2></div><p>Sin crear una cuenta.<br/>Solo elige dónde quieres vivir la historia.</p></div><div className="how-steps"><article><span>01</span><Armchair/><h3>Elige tu lugar</h3><p>Escribe tu nombre y selecciona tus butacas en el plano del auditorio.</p></article><article><span>02</span><Ticket/><h3>Guarda tus entradas</h3><p>Recibe un QR distinto por asiento. Descarga el PDF o conserva tu enlace privado.</p></article><article><span>03</span><ScanLine/><h3>Nos vemos en la sala</h3><p>Presenta tu QR y paga S/ 5 por entrada al ingresar. Nosotros ponemos la pantalla.</p></article></div></section>
-  <section className="closing-banner"><div><p className="eyebrow">VIERNES 23 · 4:30 P. M.</p><h2>Algunas historias<br/>se viven mejor juntos.</h2></div><Link href="/reservar/endgame-2026" className="button light">Quiero estar ahí <ArrowRight size={20}/></Link></section>
-</main><Footer/></>;}
+import { ArrowRight, ArrowUpRight } from "lucide-react";
+import { Header, Footer } from "@/components/brand";
+import { SNACK_OFFERS, SNACK_IMAGE } from "@/lib/presentation";
+
+export default function Home() {
+  return (
+    <>
+      <Header active="funcion" />
+      <main id="contenido" className="cinema-home">
+        <section className="cinema-hero" id="funcion" aria-labelledby="film-title">
+          <div className="hero-topline"><span>CEFINF PRESENTA</span><span>TRUJILLO, PERÚ / 2026</span></div>
+          <div className="cinema-portrait">
+            <Image src="/images/tony-stark.jpg" alt="Tony Stark en Avengers: Endgame" fill sizes="(max-width: 600px) 100vw, 65vw" preload className="tony-portrait" />
+          </div>
+          <div className="cinema-hero-content">
+            <p className="film-kicker">FUNCIÓN ESPECIAL</p>
+            <h1 id="film-title"><span>AVENGERS</span>ENDGAME</h1>
+            <p className="film-intro">La función de cine de Informática.<br />Reserva tu lugar en el auditorio.</p>
+            <div className="film-actions">
+              <Link className="button gold" href="/reservar/endgame-2026">Elegir mis butacas <ArrowUpRight size={19} /></Link>
+              <a className="plain-link" href="#combos">Ver combos <ArrowRight size={16} /></a>
+            </div>
+            <p className="film-booking-note">Sin crear una cuenta. Un QR por butaca.</p>
+          </div>
+          <dl className="function-details">
+            <div className="function-date"><dt>VIERNES</dt><dd><time dateTime="2026-10-23">23 OCT<span>2026</span></time></dd></div>
+            <div><dt>LA FUNCIÓN</dt><dd>4:30 p. m.<span>Hora de Lima</span></dd></div>
+            <div className="function-venue"><dt>NOS ENCONTRAMOS EN</dt><dd>Auditorio de<br />Ciencias Sociales<span>Universidad Nacional de Trujillo</span></dd></div>
+            <div><dt>POR ENTRADA</dt><dd>S/ 5<span>Pago al ingresar</span></dd></div>
+          </dl>
+        </section>
+        <section className="booking-guide" aria-labelledby="guide-title">
+          <figure className="guide-artwork">
+            <Image src="/images/endgame-symbol.jpg" alt="Símbolo de Avengers: Endgame en blanco y negro" width={1688} height={2500} sizes="(max-width: 600px) 280px, 358px" />
+            <figcaption>AVENGERS: ENDGAME / INFOCINE</figcaption>
+          </figure>
+          <div className="guide-copy">
+            <p className="section-label">ANTES DE LA FUNCIÓN</p>
+            <h2 id="guide-title">TU ENTRADA,<br />EN TRES PASOS.</h2>
+            <ol className="reservation-steps">
+              <li><span>01</span><div><h3>Elige tus butacas</h3><p>Escribe tu nombre y selecciona asientos en el plano de 198 butacas.</p></div></li>
+              <li><span>02</span><div><h3>Guarda tus QR</h3><p>Cada asiento tiene su propia entrada. Descarga el PDF o conserva tu enlace privado.</p></div></li>
+              <li><span>03</span><div><h3>Paga en la puerta</h3><p>Presenta un QR por persona y paga S/ 5 por entrada al ingresar.</p></div></li>
+            </ol>
+            <Link className="plain-link" href="/reservar/endgame-2026">Ir al plano del auditorio <ArrowUpRight size={17} /></Link>
+          </div>
+        </section>
+        <section className="snacks-section" id="combos" aria-labelledby="snacks-title">
+          <div className="snacks-inner">
+            <div className="snacks-heading"><p className="section-label">COMBOS Y PROMOCIONES</p><h2 id="snacks-title">CANCHITA<br />Y GASEOSA.</h2><p>Elige tu combo al llegar.<br />Venta presencial en el auditorio.</p></div>
+            <div className="snacks-layout">
+              <div className="snack-art">
+                <Image src={SNACK_IMAGE} alt="Canchita y una botella de Inca Kola" width={1180} height={1333} sizes="(max-width: 760px) 90vw, 35vw" />
+              </div>
+              <div className="snacks-menu">
+                <div className="snacks-menu-heading"><span>EL COMBO</span><span>PRECIO</span></div>
+                <ul className="snack-offers">{SNACK_OFFERS.map(offer => <li key={offer.name}><div><h3>{offer.name}</h3><p>{offer.includes}</p></div><div className="snack-offer-price">{offer.regular && <del>{offer.regular}</del>}<strong>{offer.price}</strong></div></li>)}</ul>
+                <p className="snacks-note">La web reserva butacas. Los combos se eligen y pagan en el auditorio.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+      <Footer />
+    </>
+  );
+}

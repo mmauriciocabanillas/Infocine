@@ -1,4 +1,4 @@
-# Cine CEFINF
+# INFOCINE
 
 Web de reservas para la función de Avengers: Endgame del viernes 23 de octubre de 2026, 4:30 p. m., Auditorio de Ciencias Sociales, UNT. **S/ 5 por entrada, exclusivamente al ingresar.**
 
@@ -16,7 +16,7 @@ Abre <http://127.0.0.1:3000>. Para detener el servidor: `Ctrl+C`.
 - `/`: presentación de la función.
 - `/reservar/endgame-2026`: nombre, plano de 198 butacas y confirmación.
 - `/entradas/<enlace-privado>`: un QR por asiento y descarga PDF.
-- `/admin`: reservas, cobros, ingresos, pausa y cancelación.
+- `/admin`: listado completo, filtros por ingresar/ingresadas/canceladas, cobros, pausa y cancelación.
 - `/admin/validar`: cámara, lectura de imagen o código manual.
 
 En modo local, el acceso del equipo utiliza la contraseña **LOCAL_ADMIN_PASSWORD** de `.env.local`, sin correo. Ese archivo contiene secretos, está ignorado por Git y no debe compartirse. Los datos de prueba se guardan en `.data/cine.sqlite`; no se envían a Supabase. El modo local solo atiende solicitudes de este equipo y se rechaza en Vercel.
@@ -41,12 +41,12 @@ npm run dev
 - Nombre y QR de terceros protegidos. La API pública devuelve solo función y butacas ocupadas.
 - Personal autenticado: verificar no consume el QR; al recibir el dinero se confirma pago e ingreso de forma atómica.
 - Segundo ingreso rechazado. Cancelación administrativa invalida el QR y libera la butaca; una entrada ya utilizada no se cancela.
-- Reservas locales y sus PDF identificados como pruebas sin validez para el evento.
+- Interfaz y PDF sin avisos de prueba; el proveedor local continúa separado de Supabase.
 - Fuentes servidas desde la aplicación, sin peticiones a Google Fonts.
 
 ## Conectar Supabase y Vercel
 
-**Estado al entregar:** no existen aún proyectos de Supabase/Vercel para Cine según lo indicado por el usuario. No se ejecutó la migración en la nube ni se publicó una web. La integración está implementada y la migración se comprobó en PostgreSQL embebido con PGlite; esto no sustituye una prueba contra Supabase real.
+**Estado actual:** el usuario confirmó que ya creó Supabase y desplegó en Vercel. Proyecto Supabase: https://supabase.com/dashboard/project/nporxpetsjhljqclvvjz. La revisión visual de INFOCINE se comprobó localmente; estos cambios todavía no se publicaron desde este chat. No requiere migración nueva ni cambios en las reservas existentes. Los pasos siguientes sirven como referencia de configuración.
 
 1. Crea un proyecto de Supabase en tu cuenta. Ejecuta `supabase/migrations/202610160001_cine.sql` una sola vez desde su SQL Editor. Está preparada para un proyecto nuevo.
 2. En Authentication, deshabilita el registro público y crea las cuentas del equipo. Copia sus UUID y asigna el rol en SQL:
@@ -95,6 +95,12 @@ npm audit --omit=dev
 
 Las pruebas de navegador utilizan Microsoft Edge instalado en este equipo, un servidor de producción temporal en el puerto 3001 y una base SQLite independiente por ejecución. No modifican la base del servidor de desarrollo. El servidor temporal se cierra al terminar. Las capturas y PDF de prueba se escriben en `test-results/`, ignorado por Git.
 
+## Identidad, combos y redes
+
+La investigación y las decisiones del rediseño están en `docs/REDISENO_INFOCINE.md`. La marca visible es INFOCINE. El logo vectorial conserva las formas y el círculo crema; el boleto blanco pasa a negro. Los QR nuevos usan INFOCINE y se siguen aceptando los QR con el prefijo anterior.
+
+Los precios y los enlaces sociales están en `src/lib/presentation.ts`. La fotografía de los combos está en `public/images/combos.png`, referenciada por `SNACK_IMAGE`. Canchita (S/ 2.50) y gaseosa (S/ 3.00) se muestran por separado.
+
 ## Archivos
 
 - `docs/ANALISIS_Y_DECISIONES.md`: revisión crítica y contraste con la especificación.
@@ -104,3 +110,5 @@ Las pruebas de navegador utilizan Microsoft Edge instalado en este equipo, un se
 - `tests/`: validación SQLite, PostgreSQL y flujos de navegador.
 
 Referencias técnicas consultadas: [Route Handlers de Next.js](https://nextjs.org/docs/app/getting-started/route-handlers), [funciones PostgreSQL en Supabase](https://supabase.com/docs/guides/database/functions), [validación del usuario en Supabase](https://supabase.com/docs/reference/javascript/auth-getuser).
+
+Los avisos de prueba se retiraron por solicitud del organizador. Esto no migra datos de SQLite a Supabase ni publica cambios automáticamente. La configuración predeterminada del servidor es Supabase; el desarrollo local se activa explícitamente con DATA_BACKEND=local.

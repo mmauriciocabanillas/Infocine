@@ -4,7 +4,7 @@ import { AppError, EVENT_ID, type AdminTicket, type Booking, type FilmEvent, typ
 import { LocalStore, fingerprintFor } from "./local-store";
 
 export function backend(): "local" | "supabase" {
-  const mode = process.env.DATA_BACKEND;
+  const mode = process.env.DATA_BACKEND ?? "supabase";
   if (mode === "supabase") return mode;
   if (mode === "local" && !process.env.VERCEL) return mode;
   throw new AppError("CONFIG", "El servicio todavía no está configurado.", 503);

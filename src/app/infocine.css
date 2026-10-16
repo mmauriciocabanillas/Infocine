@@ -1,0 +1,336 @@
+/* INFOCINE: cartel de cine, información de la función y carta de confitería. */
+:root {
+  --bg: #0c0c0b;
+  --panel: #181816;
+  --line: #373731;
+  --muted: #b2b0a6;
+  --text: #fbf1db;
+  --gold: #fbf1db;
+  --gold-dark: #d4c9af;
+  --blue: #d4c9af;
+  --font: "Public Sans", "Segoe UI", sans-serif;
+  --display: "Anton", "Arial Narrow", sans-serif;
+}
+
+body { font-size: 14px; }
+.button { border-radius: 2px; min-height: 50px; font-size: 13px; padding: 15px 23px; }
+.button.gold { background: var(--text); color: #121210; }
+.button.gold:hover:not(:disabled) { background: #e2d4b7; }
+.button:hover:not(:disabled) { transform: none; }
+.button.outline { color: var(--text); }
+.local-notice { color: #cec2a8; background: #fbf1db06; border-color: #fbf1db16; }
+.eyebrow { color: #c6bfae; letter-spacing: 1.5px; }
+
+/* Marca y navegación */
+.site-header { background: var(--bg); border-bottom: 1px solid var(--line); position: relative; z-index: 5; }
+.header-inner { max-width: 1360px; margin: auto; height: 94px; padding: 0 48px; display: flex; align-items: center; justify-content: space-between; }
+.brand { display: inline-flex; align-items: center; gap: 13px; }
+.brand img { display: block; width: 46px; height: 46px; }
+.brand > span { font-family: var(--display); font-size: 29px; font-weight: 400; letter-spacing: 0.8px; }
+.site-header nav { display: flex; gap: 32px; align-items: center; }
+.site-header nav > a { font-size: 12px; color: #d6d1c3; padding: 11px 0; }
+.site-header nav > a:hover, .site-header nav > a.active { color: #fff9e9; }
+.site-header nav > a.active:not(.nav-reserve) { text-decoration: underline; text-underline-offset: 7px; }
+.site-header nav > .nav-reserve { padding: 12px 16px; background: var(--text); color: #121210; display: flex; gap: 12px; align-items: center; border-radius: 2px; font-weight: 600; }
+.site-header nav > .nav-reserve:hover, .site-header nav > .nav-reserve.active { background: #e2d4b7; color: #121210; }
+.plain-link { display: inline-flex; align-items: center; gap: 13px; padding: 12px 0; font-size: 13px; text-decoration: underline; text-underline-offset: 6px; }
+.plain-link:hover { color: #d4c9af; }
+.section-label, .film-kicker { font-size: 11px; letter-spacing: 2px; font-weight: 600; }
+
+/* Portada: la fotografía es parte del cartel, sin marco de tarjeta. */
+.cinema-hero { position: relative; isolation: isolate; max-width: 1360px; min-height: 840px; margin: auto; padding: 31px 48px 0; overflow: hidden; }
+.hero-topline { position: relative; z-index: 2; display: flex; align-items: center; justify-content: space-between; color: #b9b5a9; font-size: 10px; letter-spacing: 1.8px; }
+.cinema-portrait { position: absolute; z-index: -1; right: -25px; top: 45px; bottom: 115px; width: 70%; mix-blend-mode: lighten; mask-image: linear-gradient(to right, transparent 0%, black 28%, black 100%); }
+.cinema-portrait > img { object-fit: cover; object-position: center 35%; }
+.cinema-portrait::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to top, var(--bg) 0%, transparent 24%, transparent 90%); }
+.cinema-hero-content { padding: 88px 0 80px; position: relative; z-index: 1; width: 64%; }
+.film-kicker { color: #c8c0ac; margin-bottom: 25px; }
+.cinema-hero h1 { font-family: var(--display); font-size: clamp(94px, 10.3vw, 142px); font-weight: 400; line-height: 1.04; letter-spacing: -1px; }
+.cinema-hero h1 > span { display: block; font-size: 0.62em; line-height: 1.06; letter-spacing: 1px; margin-bottom: 3px; }
+.film-intro { max-width: 360px; margin-top: 24px; color: #d2cbbc; font-size: 15px; line-height: 1.7; }
+.film-actions { display: flex; align-items: center; gap: 27px; margin-top: 31px; }
+.film-booking-note { margin-top: 17px; font-size: 11px; color: #a8a398; }
+.function-details { position: relative; z-index: 1; display: grid; grid-template-columns: 1.05fr 1fr 1.65fr 0.7fr; padding: 26px 0 30px; border-top: 1px solid #88817366; margin: 0; gap: 30px; }
+.function-details dt { font-size: 9px; letter-spacing: 1.7px; color: #aaa495; margin-bottom: 11px; }
+.function-details dd { margin: 0; font-size: 23px; font-weight: 500; line-height: 1.25; }
+.function-details dd span { display: block; font-family: var(--font); font-size: 11px; font-weight: 400; color: #b1aa9b; line-height: 1.5; margin-top: 8px; }
+.function-date dd { font-family: var(--display); font-size: 33px; font-weight: 400; }
+.function-date dd span { display: inline; margin-left: 12px; }
+.function-venue dd { font-size: 19px; }
+
+/* La imagen de apoyo conserva su composición completa junto a la reserva. */
+.booking-guide { max-width: 1264px; margin: 0 auto; padding: 85px 48px 95px; display: grid; grid-template-columns: 1fr 0.92fr; gap: 76px; border-top: 1px solid var(--line); align-items: center; }
+.guide-artwork { width: 100%; max-width: 358px; margin: 0 auto; }
+.guide-artwork > img { display: block; width: 100%; height: auto; }
+.guide-artwork > figcaption { text-align: right; margin-top: 14px; font-size: 8px; letter-spacing: 1.6px; color: #969184; }
+.guide-copy h2 { font-family: var(--display); font-size: 49px; font-weight: 400; line-height: 1.15; margin-top: 19px; }
+.reservation-steps { list-style: none; padding: 0; margin: 30px 0 13px; }
+.reservation-steps li { border-top: 1px solid var(--line); display: grid; grid-template-columns: 36px 1fr; gap: 17px; padding: 21px 0; }
+.reservation-steps li > span { color: #c9c0ad; font-size: 11px; padding-top: 3px; }
+.reservation-steps h3 { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+.reservation-steps p { font-size: 12px; color: var(--muted); line-height: 1.7; max-width: 320px; }
+.guide-copy > .plain-link { font-size: 12px; }
+
+/* Carta informativa: los combos no se añaden a la reserva de butacas. */
+.snacks-section { background: var(--text); color: #191915; }
+.snacks-inner { max-width: 1264px; margin: auto; padding: 70px 48px 76px; }
+.snacks-heading { display: grid; grid-template-columns: 1fr 1fr; column-gap: 50px; align-items: end; margin-bottom: 42px; }
+.snacks-heading .section-label { grid-column: 1 / -1; margin-bottom: 16px; color: #625e52; }
+.snacks-heading h2 { font-family: var(--display); font-size: 60px; line-height: 1.1; font-weight: 400; }
+.snacks-heading > p:last-child { font-size: 14px; line-height: 1.8; color: #625e52; padding-bottom: 5px; }
+.snacks-layout { display: grid; grid-template-columns: 0.8fr 1.2fr; gap: 60px; align-items: stretch; }
+.snack-art { align-self: start; background: #fff; }
+.snack-art > img { display: block; width: 100%; height: auto; }
+.snack-image-placeholder { position: absolute; inset: 14px; border: 1px dashed #b7ab91; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 24px; color: #7a715e; padding: 22px; text-align: center; }
+.snack-image-placeholder > span:first-child { font-size: 9px; letter-spacing: 2px; position: absolute; left: 16px; top: 18px; }
+.snack-image-placeholder > strong { font-family: var(--display); font-size: 43px; line-height: 1.2; font-weight: 400; color: #6f6654; }
+.snack-placeholder-caption { font-size: 10px; position: absolute; bottom: 20px; }
+.snacks-menu { min-width: 0; }
+.snacks-menu-heading { display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #26261f; padding-bottom: 13px; font-size: 9px; letter-spacing: 1.9px; color: #625e52; }
+.snack-offers { list-style: none; padding: 0; margin: 0; }
+.snack-offers > li { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 20px; padding: 19px 0; border-bottom: 1px solid #bcb39e; }
+.snack-offers h3 { font-size: 15px; font-weight: 700; line-height: 1.4; }
+.snack-offers p { font-size: 11px; color: #655f51; margin-top: 5px; }
+.snack-offer-price { text-align: right; display: flex; flex-direction: column; gap: 5px; font-variant-numeric: tabular-nums; }
+.snack-offer-price strong { font-size: 19px; font-weight: 600; white-space: nowrap; }
+.snack-offer-price del { color: #6c6658; font-size: 10px; }
+.snacks-note { font-size: 10px; color: #655f51; margin-top: 18px; line-height: 1.7; }
+
+/* Pie: organizador y enlaces proporcionados por CEFINF. */
+.site-footer { max-width: 1264px; margin: auto; padding: 55px 48px 22px; }
+.footer-top { display: grid; grid-template-columns: 1.4fr 0.7fr; gap: 80px; padding-bottom: 42px; }
+.footer-brand { display: inline-flex; align-items: center; gap: 16px; }
+.footer-brand > span { font-family: var(--display); font-weight: 400; font-size: 40px; letter-spacing: 1px; }
+.footer-identity > p { font-size: 12px; color: var(--muted); margin-top: 20px; line-height: 1.8; }
+.footer-socials > h2 { font-size: 12px; font-weight: 500; color: #b8b2a4; margin: 3px 0 10px; }
+.footer-socials > a { display: flex; gap: 14px; align-items: center; padding: 15px 0; border-bottom: 1px solid var(--line); }
+.footer-socials > a > span { flex: 1; font-size: 13px; }
+.footer-socials small { font-size: 10px; color: #b2aa99; display: block; margin-top: 5px; }
+.footer-socials > a:hover { color: #fff; }
+.footer-bottom { border-top: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; padding-top: 23px; color: #a6a092; font-size: 9px; letter-spacing: 0.4px; }
+.footer-bottom > div { display: flex; gap: 25px; }
+.footer-bottom a { display: inline-flex; align-items: center; gap: 6px; }
+
+/* El mismo lenguaje en reserva, entradas y administración. */
+.auditorium-panel, .booking-summary, .login-card, .admin-table-panel,
+.stats-grid article, .scanner-panel, .verification-panel, .save-notice,
+.confirm-dialog { background: #181816; border-color: var(--line); border-radius: 3px; }
+.booking-heading h1, .entries-heading h1, .admin-heading h1,
+.login-card h1, .text-page h1 { font-weight: 400; letter-spacing: 0.2px; }
+.booking-summary h2 { font-size: 22px; }
+.panel-top, .summary-event, .summary-event svg, .map-caption,
+.row-label, .seat-legend, .back-link { color: #b8b2a3; }
+.panel-top > span:first-child { color: var(--text); }
+.panel-top { font-size: 10px; }
+.screen { border-top-color: #b5ac97; background: radial-gradient(ellipse at top,#fbf1db0c,transparent 70%); }
+.screen span, .block-labels { color: #aaa28f; }
+.seat-scroll { scrollbar-color: #7d7462 #181816; }
+.seat-rows { gap: 8px; }
+.seat-row { gap: 5px; }
+.seat { position: relative; width: 40px; height: 44px; border: 0; border-radius: 0; background: transparent; padding: 0; color: #68675f; display: block; }
+.seat > .cinema-seat-symbol { display: block; width: 40px; height: 40px; }
+.seat .seat-number { position: absolute; inset: 11px 0 auto; text-align: center; line-height: 1; font-size: 10px; font-weight: 600; color: #fff5dd; }
+.seat:hover:not(:disabled), .seat.chosen, .seat.chosen:hover:not(:disabled) { background: transparent; color: var(--text); }
+.seat:hover:not(:disabled) .seat-number, .seat.chosen .seat-number { color: #161613; }
+.seat.taken { background: transparent; color: #383832; opacity: 1; }
+.seat.taken .seat-number { color: #aaa89e; }
+.seat .selection-mark { position: absolute; top: 0; right: -1px; width: 13px; height: 13px; background: #fbf1db; color: #151512; border: 1px solid #181816; border-radius: 50%; padding: 1px; }
+.seat .occupied-mark { position: absolute; bottom: 0; right: -1px; color: #aaa89e; }
+.free-key { background: #68675f; border-color: #68675f; }
+.chosen-key { background: var(--text); }
+.taken-key { background: #383832; border-color: #6c6b61; }
+input:not([type=checkbox]) { background: #10100e; border-color: #4d4b42; color: var(--text); font-size: 13px; }
+input::placeholder { color: #a09a8a; font-size: 11px; }
+.checkbox-label { font-size: 11px; color: #bbb4a4; }
+.checkbox-label a { color: var(--text); }
+.summary-event { font-size: 11px; line-height: 1.6; }
+.booking-summary label:not(.checkbox-label), .login-card label, .manual-qr > label { font-size: 12px; }
+.summary-total b, .entry-seat strong, .stats-grid article > b, .verified-seat { font-weight: 400; }
+.selected-seats p, .selected-heading, .summary-total small, .secure-note { color: #b7ae9b; font-size: 11px; }
+.selected-seats button { color: var(--text); border-color: #6d634d; background: #fbf1db08; }
+.notice { color: #e3d6b7; border-color: #fbf1db30; background: #fbf1db05; }
+.search-box { background: #10100e; border-color: var(--line); color: #a99f8c; }
+th { background: #23231f; color: #c9bfa9; }
+td { color: #d0c5ad; }
+.seat-pill { background: #34332c; color: var(--text); }
+.table-toolbar p, .stats-grid article > span, .stats-grid article > small { color: #b5ac99; }
+.stats-grid svg { color: #b5ac99; }
+.camera-view { background: #0d0d0b; border-color: #4c493d; }
+.verification-empty, .verification-empty p, .scan-corners, .camera-view > span { color: #b3a992; }
+.entry-card { border-color: #68604f; border-radius: 3px; background: #181816; box-shadow: none; }
+.entry-art { height: 170px; }
+.entry-art > img { position: static; width: 100%; max-width: 100%; height: 100%; object-fit: cover; object-position: center 34%; opacity: 0.85; filter: none; }
+.entry-art::after { background: linear-gradient(transparent 25%, #181816); }
+.entry-art h2 { font-weight: 400; font-size: 35px; }
+.entry-art h2 small { font-weight: 400; font-size: 16px; letter-spacing: 5px; }
+.entry-seat { border-color: #6d634f; }
+.entry-brand { font-size: 10px; }
+.entry-brand > img { width: 22px; height: 22px; }
+.entry-brand > span { color: #cfc4ac; font-size: 8px; }
+.entry-seat span, .entry-date > span, .entry-fineprint { color: #c1b69f; }
+.entry-download { background: #23231f; border-color: #6d634f; color: var(--text); font-size: 11px; }
+.entry-download:hover { background: #323129; }
+.text-page > p:not(.eyebrow) { color: #c1b69f; }
+
+@media (min-width: 1500px) {
+  .cinema-hero { min-height: 880px; }
+  .cinema-hero-content { padding-top: 110px; padding-bottom: 90px; }
+}
+@media (max-width: 1050px) {
+  .header-inner { padding: 0 30px; }
+  .cinema-hero { padding-left: 30px; padding-right: 30px; min-height: 800px; }
+  .cinema-hero-content { padding-top: 85px; padding-bottom: 75px; width: 75%; }
+  .cinema-hero h1 { font-size: 112px; }
+  .cinema-portrait { width: 75%; right: -60px; }
+  .function-details { gap: 24px; }
+  .function-details dd { font-size: 21px; }
+  .function-venue dd { font-size: 17px; }
+  .booking-guide { padding: 65px 30px 75px; gap: 40px; }
+  .guide-copy h2 { font-size: 43px; }
+  .snacks-inner { padding: 65px 30px; }
+  .snacks-layout { gap: 35px; grid-template-columns: 0.75fr 1.25fr; }
+  .snacks-heading { column-gap: 35px; }
+  .snacks-heading h2 { font-size: 53px; }
+  .snack-offers > li { gap: 14px; }
+  .snack-image-placeholder > strong { font-size: 36px; }
+  .site-footer { padding-left: 30px; padding-right: 30px; }
+}
+@media (max-width: 760px) {
+  .header-inner { height: 80px; padding: 0 23px; }
+  .brand { gap: 10px; }
+  .brand > span { font-size: 26px; }
+  .brand > img { width: 41px; height: 41px; }
+  .site-header nav { gap: 22px; }
+  .site-header nav > a { font-size: 11px; }
+  .site-header nav > .nav-reserve { padding: 11px 13px; gap: 8px; }
+  .cinema-hero { min-height: 800px; padding: 27px 25px 0; }
+  .hero-topline { font-size: 8px; letter-spacing: 1.2px; }
+  .cinema-portrait { width: 90%; top: 45px; bottom: 145px; right: -90px; }
+  .cinema-hero-content { width: 95%; padding: 86px 0 65px; }
+  .cinema-hero h1 { font-size: 102px; }
+  .film-intro { font-size: 14px; }
+  .function-details { grid-template-columns: 1fr 1fr; padding-top: 25px; gap: 24px 30px; }
+  .function-details > div { border-bottom: 1px solid #5d584b55; padding-bottom: 17px; }
+  .function-details > div:nth-last-child(-n+2) { border: 0; }
+  .function-details dt { font-size: 8px; margin-bottom: 8px; }
+  .function-details dd { font-size: 22px; }
+  .function-date dd { font-size: 28px; }
+  .function-venue dd { font-size: 17px; }
+  .function-details dd span { font-size: 10px; }
+  .booking-guide { gap: 30px; padding: 60px 25px; grid-template-columns: 0.8fr 1.2fr; }
+  .guide-artwork > figcaption { font-size: 6px; letter-spacing: 0.6px; }
+  .guide-copy h2 { font-size: 37px; }
+  .section-label { font-size: 9px; letter-spacing: 1.4px; }
+  .reservation-steps { margin-top: 24px; }
+  .reservation-steps li { gap: 10px; grid-template-columns: 25px 1fr; padding: 17px 0; }
+  .reservation-steps h3 { font-size: 13px; }
+  .reservation-steps p { font-size: 11px; }
+  .snacks-inner { padding: 55px 25px; }
+  .snacks-heading { column-gap: 25px; }
+  .snacks-heading h2 { font-size: 45px; }
+  .snacks-heading > p:last-child { font-size: 12px; }
+  .snacks-layout { grid-template-columns: 1fr; gap: 32px; }
+  .snack-image-placeholder { flex-direction: row; gap: 30px; }
+  .snack-image-placeholder > strong { font-size: 42px; text-align: left; }
+  .snack-offers h3 { font-size: 16px; }
+  .snack-offers p { font-size: 12px; }
+  .snack-offer-price strong { font-size: 21px; }
+  .site-footer { padding: 43px 25px 22px; }
+  .footer-top { gap: 35px; grid-template-columns: 1fr 1fr; }
+  .footer-brand > img { height: 44px; width: 44px; }
+  .footer-brand > span { font-size: 32px; }
+  .footer-brand { gap: 11px; }
+  .footer-identity p { font-size: 10px; }
+  .footer-socials > h2 { font-size: 11px; }
+  .footer-socials > a { gap: 10px; }
+}
+@media (max-width: 600px) {
+  .header-inner { padding: 0 18px; height: 74px; }
+  .brand > img { width: 34px; height: 34px; }
+  .brand { gap: 8px; }
+  .brand > span { font-size: 22px; letter-spacing: 0.3px; }
+  .site-header nav { gap: 14px; }
+  .site-header nav > a { font-size: 10px; }
+  .site-header nav > .nav-reserve { padding: 10px 11px; gap: 5px; }
+  .nav-reserve svg { width: 13px; height: 13px; }
+  .cinema-hero { min-height: auto; padding: 23px 23px 0; }
+  .hero-topline { font-size: 7px; letter-spacing: 0.8px; }
+  .cinema-portrait { top: 27px; right: -70px; bottom: auto; height: 505px; width: 125%; mask-image: linear-gradient(to right, transparent, black 22%, black 100%); }
+  .cinema-portrait > img { object-position: center 30%; }
+  .cinema-portrait::after { background: linear-gradient(to top, var(--bg) 0%, #0c0c0b66 23%, transparent 60%); }
+  .cinema-hero-content { padding: 290px 0 35px; width: 100%; }
+  .film-kicker { font-size: 9px; letter-spacing: 1.6px; margin-bottom: 15px; }
+  .cinema-hero h1 { font-size: clamp(67px, 19.5vw, 114px); letter-spacing: -0.5px; }
+  .cinema-hero h1 > span { font-size: 0.65em; letter-spacing: 1px; }
+  .film-intro { margin-top: 20px; font-size: 13px; }
+  .film-actions { margin-top: 24px; gap: 20px; }
+  .film-actions .button { padding: 14px 18px; font-size: 11px; min-height: 48px; gap: 12px; }
+  .film-actions > .plain-link { font-size: 11px; gap: 8px; }
+  .film-booking-note { font-size: 9px; margin-top: 14px; }
+  .function-details { gap: 22px 23px; padding-top: 23px; padding-bottom: 23px; }
+  .function-details dd { font-size: 21px; }
+  .function-date dd { font-size: 28px; }
+  .function-date dd span { font-size: 9px; margin-left: 8px; }
+  .function-venue dd { font-size: 16px; }
+  .function-details dt { font-size: 7px; letter-spacing: 1.1px; }
+  .function-details dd span { font-size: 9px; }
+  .booking-guide { padding: 45px 23px 50px; display: flex; flex-direction: column; gap: 34px; align-items: stretch; }
+  .guide-copy { order: -1; }
+  .guide-copy h2 { font-size: 42px; margin-top: 15px; }
+  .reservation-steps h3 { font-size: 14px; }
+  .reservation-steps p { font-size: 12px; max-width: 290px; }
+  .reservation-steps li { grid-template-columns: 29px 1fr; padding: 18px 0; }
+  .guide-copy > .plain-link { font-size: 12px; }
+  .guide-artwork { max-width: 280px; }
+  .guide-artwork > figcaption { font-size: 6px; letter-spacing: 0.9px; }
+  .snacks-inner { padding: 43px 23px 45px; }
+  .snacks-heading { display: block; margin-bottom: 28px; }
+  .snacks-heading .section-label { font-size: 9px; margin-bottom: 15px; }
+  .snacks-heading h2 { font-size: 49px; }
+  .snacks-heading > p:last-child { padding: 0; font-size: 12px; margin-top: 22px; }
+  .snack-image-placeholder { inset: 10px; padding: 18px; gap: 24px; }
+  .snack-image-placeholder > svg { width: 69px; height: 69px; }
+  .snack-image-placeholder > strong { font-size: 32px; }
+  .snack-image-placeholder > span:first-child { font-size: 7px; top: 13px; left: 14px; }
+  .snack-placeholder-caption { font-size: 9px; bottom: 15px; }
+  .snack-offers > li { gap: 13px; padding: 18px 0; }
+  .snack-offers h3 { font-size: 13px; }
+  .snack-offers p { font-size: 10px; line-height: 1.6; }
+  .snack-offer-price strong { font-size: 17px; }
+  .snack-offer-price del { font-size: 9px; }
+  .snacks-note { font-size: 10px; margin-top: 17px; }
+  .site-footer { padding: 37px 23px 22px; }
+  .footer-top { grid-template-columns: 1fr; gap: 28px; padding-bottom: 30px; }
+  .footer-brand > span { font-size: 36px; }
+  .footer-identity p { font-size: 11px; margin-top: 16px; }
+  .footer-socials > h2 { font-size: 12px; }
+  .footer-socials > a { padding: 15px 0; }
+  .footer-socials > a > span { display: flex; align-items: center; gap: 12px; font-size: 12px; }
+  .footer-socials small { margin: 0; font-size: 10px; }
+  .footer-bottom { align-items: flex-start; gap: 20px; font-size: 8px; padding-top: 20px; }
+  .footer-bottom > div { gap: 18px; }
+  .booking-heading h1 { font-size: 39px; }
+  .booking-summary { padding: 23px; }
+  .seat { width: 40px; height: 44px; }
+  .seat-legend { font-size: 9px; }
+  .entries-heading h1 { font-size: 37px; }
+  .login-card h1 { font-size: 35px; }
+  .admin-heading h1 { font-size: 29px; }
+}
+@media (max-width: 370px) {
+  .header-inner { padding: 0 12px; }
+  .site-header nav { gap: 11px; }
+  .site-header nav > a { font-size: 9px; }
+  .brand > span { font-size: 20px; }
+  .brand > img { width: 31px; height: 31px; }
+  .cinema-hero, .booking-guide, .snacks-inner, .site-footer { padding-left: 19px; padding-right: 19px; }
+  .snack-offer-price strong { font-size: 15px; }
+  .snack-offers h3 { font-size: 12px; }
+}
+
+.ticket-filters { display: flex; flex-wrap: wrap; gap: 8px; padding: 0 23px 20px; }
+.ticket-filters button { display: inline-flex; align-items: center; gap: 9px; border: 1px solid var(--line); background: transparent; color: var(--text); padding: 10px 13px; font: inherit; font-size: 12px; cursor: pointer; }
+.ticket-filters button[aria-pressed="true"] { background: var(--text); color: #191915; border-color: var(--text); }
+.ticket-filters button span { font-variant-numeric: tabular-nums; opacity: .7; }
+.ticket-results { margin: 0 23px 18px; color: var(--muted); font-size: 11px; line-height: 1.6; }
+@media (max-width: 600px) { .ticket-filters { padding: 0 18px 18px; gap: 7px; } .ticket-filters button { font-size: 11px; padding: 9px 10px; } .ticket-results { margin: 0 18px 16px; } }
