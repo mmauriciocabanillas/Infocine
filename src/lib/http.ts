@@ -1,8 +1,8 @@
 import "server-only";
-import { createHmac } from "node:crypto";
 import { ZodError } from "zod";
 import { AppError } from "./domain";
 import { backend, store } from "./store";
+import { rateLimitKey } from "./reservation-security";
 
 export function json(data:unknown,status=200) { return Response.json(data,{status,headers:{"Cache-Control":"private, no-store","Vary":"Cookie"}}); }
 export async function handle(request:Request, fn:()=>Promise<unknown>) {
@@ -20,7 +20,11 @@ export async function handle(request:Request, fn:()=>Promise<unknown>) {
     }
     return json(await fn());
   } catch(error) {
-    if(error instanceof AppError) return json({error:error.message,code:error.code},error.status);
+    if(error instanceof AppError) {
+      const response=json({error:error.message,code:error.code},error.status);
+      if(error.code==="RATE_LIMIT")response.headers.set("Retry-After","600");
+      return response;
+    }
     if(error instanceof ZodError) return json({error:error.issues[0]?.message??"Revisa los datos.",code:"VALIDATION"},400);
     if(error instanceof SyntaxError) return json({error:"Datos no válidos.",code:"VALIDATION"},400);
     console.error("Cine request failed",error instanceof Error ? error.message : "unknown");
@@ -35,10 +39,10 @@ export async function readBody(request:Request) {
   return JSON.parse(Buffer.concat(chunks).toString("utf8"));
 }
 export async function rateLimit(request:Request,bucket:string,limit:number,seconds:number) {
-  // Vercel sobrescribe x-vercel-forwarded-for; no confiar en x-forwarded-for enviado por visitantes.
-  const address=process.env.VERCEL ? request.headers.get("x-vercel-forwarded-for")?.split(",")[0]?.trim() ?? "unknown" : "loopback";
-  const secret=process.env.RATE_LIMIT_SECRET;
-  if(!secret || secret.length<32) throw new AppError("CONFIG","Falta configurar la protección de solicitudes.",503);
-  const key=createHmac("sha256",secret).update(`${bucket}:${address}`).digest("hex");
-  await store.rateLimit(key,limit,seconds);
+  const key=rateLimitKey(request,bucket,process.env.RATE_LIMIT_SECRET);
+  try { await store.rateLimit(key,limit,seconds); }
+  catch(error) {
+    if(bucket==="reserve"&&error instanceof AppError&&error.code==="RATE_LIMIT")throw new AppError("RATE_LIMIT","Esta conexión alcanzó el límite de 3 intentos de reserva. Espera 10 minutos y vuelve a intentar.",429);
+    throw error;
+  }
 }

@@ -1,6 +1,8 @@
 import { test,expect } from "@playwright/test";
 import { readFileSync } from "node:fs";
 import QRCode from "qrcode";
+import { clearQARateLimits,seedQABooking } from "./qa";
+test.beforeEach(()=>clearQARateLimits());
 const password=readFileSync(".env.local","utf8").match(/^LOCAL_ADMIN_PASSWORD=(.+)$/m)?.[1]?.trim();
 const origin="http://127.0.0.1:3001";
 test("Reserva, QR individual, PDF, control de puerta y cancelación",async({page,request})=>{
@@ -56,8 +58,7 @@ test("El lector interpreta veinte QR distintos generados por la aplicación",asy
   const seats=Array.from({length:18},(_,i)=>`H${String(i+1).padStart(2,"0")}`).concat(["I01","I02"]);
   const tickets=[];
   for(let index=0;index<seats.length;index+=4){
-    const reserved=await request.post("/api/reservations",{headers:{Origin:origin},data:{eventId:"endgame-2026",name:`Lector de imagen QA ${index}`,seats:seats.slice(index,index+4),privacyAccepted:true,requestId:crypto.randomUUID()}});expect(reserved.ok()).toBeTruthy();
-    const {accessToken}=await reserved.json();tickets.push(...(await(await request.get(`/api/entries/${accessToken}`)).json()).tickets);
+    const booking=seedQABooking(`Lector de imagen QA ${index}`,seats.slice(index,index+4));tickets.push(...booking.tickets);
   }
   await page.goto("/admin/validar");await page.getByLabel("Contraseña",{exact:true}).fill(password!);await page.getByRole("button",{name:"Ingresar al equipo"}).click();await expect(page.getByRole("heading",{name:"Control de ingreso."})).toBeVisible();
   for(const [index,ticket] of tickets.entries()){const prefix=index%2===0?"INFOCINE":"CINECEFINF";const buffer=await QRCode.toBuffer(`${prefix}:${ticket.token}`,{width:320,margin:4,errorCorrectionLevel:"M"});await page.locator('input[type="file"]').setInputFiles({name:`${ticket.seat}.png`,mimeType:"image/png",buffer});await expect(page.getByRole("heading",{name:ticket.seat,exact:true})).toBeVisible();}
@@ -82,7 +83,7 @@ test("Límite de cuatro, selección y borrado definitivo en todas las listas, el
   await page.getByRole("button",{name:/^Todas\d*/}).click();await page.getByRole("button",{name:"Seleccionar visibles",exact:true}).click();await page.getByRole("button",{name:"Eliminar seleccionadas"}).click();
   dialog=page.getByRole("dialog");await dialog.getByLabel("Escribe ELIMINAR para confirmar").fill("ELIMINAR");await dialog.getByRole("button",{name:"Eliminar definitivamente"}).click();await expect(dialog).toHaveCount(0);
   expect((await request.get(`/api/entries/${access}`)).status()).toBe(404);expect((await page.request.post("/api/admin/ticket",{headers,data:{token:booking.tickets[0].token,action:"verify"}})).status()).toBe(404);
-  async function reserve(name:string){const response=await request.post("/api/reservations",{headers,data:{...body,requestId:crypto.randomUUID(),name,seats:["J01","J02"]}});expect(response.ok()).toBeTruthy();const {accessToken}=await response.json();return (await request.get(`/api/entries/${accessToken}`)).json();}
+  async function reserve(name:string){return seedQABooking(name,["J01","J02"]);}
   const beforeClear=await reserve("Eliminar todas QA");await page.request.patch("/api/admin/dashboard",{headers,data:{open:false}});await page.reload();await page.getByLabel("Buscar por nombre o butaca").fill("");
   await page.getByRole("button",{name:"Eliminar todas",exact:true}).click();dialog=page.getByRole("dialog");await dialog.getByLabel("Escribe ELIMINAR TODO para confirmar").fill("ELIMINAR TODO");await dialog.getByRole("button",{name:"Eliminar definitivamente"}).click();await expect(dialog).toHaveCount(0);
   expect((await request.get(`/api/entries/${beforeClear.access_token}`)).status()).toBe(404);expect((await(await request.get("/api/event")).json()).event.booking_open).toBe(false);

@@ -81,5 +81,13 @@ test("Migración PostgreSQL: permisos, atomicidad, aforo, idempotencia, QR y rol
     await assert.rejects(()=>rpc("public.cine_verify('endgame-2026',$1)",[b.tickets[0].token]),/INVALID/);await assert.rejects(()=>rpc("public.cine_booking($1)",[b.access_token]),/NOT_FOUND/);
     assert.equal((await remove("reset",null,"REINICIAR")).deleted,0);
   });
+  await t.test("Supabase comparte tres intentos entre solicitudes, rechaza el cuarto y renueva al vencer",async()=>{
+    const attempts=await Promise.allSettled(Array.from({length:4},()=>rpc("public.cine_rate_limit('reserve-ip-qa',3,600)")));
+    assert.equal(attempts.filter(r=>r.status==="fulfilled").length,3);assert.equal(attempts.filter(r=>r.status==="rejected").length,1);
+    await assert.rejects(()=>rpc("public.cine_rate_limit('reserve-ip-qa',3,600)"),/RATE_LIMIT/);
+    await rpc("public.cine_rate_limit('reserve-other-ip-qa',3,600)");
+    await pg.exec("update public.cine_rate_limits set resets_at=now()-interval '1 second' where key='reserve-ip-qa'");
+    await rpc("public.cine_rate_limit('reserve-ip-qa',3,600)");
+  });
   await pg.close();
 });

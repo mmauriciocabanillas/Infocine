@@ -38,6 +38,8 @@ npm run dev
 - Una reserva bloquea el asiento sin marcarlo pagado. No existen formularios ni integración de pago online.
 - Tokens aleatorios por entrada y enlace privado de recuperación; no se busca una reserva por nombre.
 - Disponibilidad actualizada cada 5 segundos y verificada nuevamente al confirmar.
+- Protección contra reservas automatizadas: máximo **3 intentos de reserva por IP cada 10 minutos**, aunque cambie el nombre. Incluye errores y reintentos; el cuarto devuelve HTTP 429 con `Retry-After: 600`. Consultar el plano y administrar entradas no consume esa cuota. Una IP puede obtener hasta 12 entradas en la ventana (3 reservas de 4).
+- En Vercel se utiliza `x-vercel-forwarded-for`, validada y normalizada, y se guarda únicamente su HMAC con `RATE_LIMIT_SECRET`. El contador está en Supabase, compartido entre instancias; reiniciar Vercel o cambiar de navegador no lo reinicia. Si Vercel no entrega una IP válida, se rechaza la operación.
 - Nombre y QR de terceros protegidos. La API pública devuelve solo función y butacas ocupadas.
 - Personal autenticado: verificar no consume el QR; al recibir el dinero se confirma pago e ingreso de forma atómica.
 - Segundo ingreso rechazado. Cancelación administrativa invalida el QR y libera la butaca; una entrada ya utilizada no se cancela.
@@ -49,6 +51,8 @@ npm run dev
 ## Conectar Supabase y Vercel
 
 El proyecto ya está creado en Supabase y desplegado en Vercel. Esta actualización necesita ejecutar **`supabase/migrations/202610190001_limits_and_bulk_delete.sql`** en el SQL Editor del proyecto existente y publicar el código actualizado. La migración conserva las reservas actuales; instala el límite y la operación administrativa de borrado. Se puede repetir sin borrar datos.
+
+El bloqueo por IP reutiliza `cine_rate_limit`, ya instalado en la migración original. **No requiere otra migración, claves nuevas ni servicios adicionales**: basta publicar el código, conservando `RATE_LIMIT_SECRET` y la conexión actual a Supabase. Usuarios del mismo wifi pueden compartir la cuota; cambiar a otra IP permite eludirla. No garantiza identidad ni detiene por completo ataques con IP distribuidas.
 
 1. Solo para un proyecto nuevo: ejecuta primero `supabase/migrations/202610160001_cine.sql` una vez y después `supabase/migrations/202610190001_limits_and_bulk_delete.sql`. En el proyecto existente ejecuta únicamente la segunda migración.
 2. En Authentication, deshabilita el registro público y crea las cuentas del equipo. Copia sus UUID y asigna el rol en SQL:
