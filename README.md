@@ -16,7 +16,7 @@ Abre <http://127.0.0.1:3000>. Para detener el servidor: `Ctrl+C`.
 - `/`: presentación de la función.
 - `/reservar/endgame-2026`: nombre, plano de 198 butacas y confirmación.
 - `/entradas/<enlace-privado>`: un QR por asiento y descarga PDF.
-- `/admin`: listado completo, filtros por ingresar/ingresadas/canceladas, cobros, pausa y cancelación.
+- `/admin`: listado completo, filtros, cobros, pausa, cancelación, selección múltiple, borrado definitivo y restablecimiento de la función.
 - `/admin/validar`: cámara, lectura de imagen o código manual.
 
 En modo local, el acceso del equipo utiliza la contraseña **LOCAL_ADMIN_PASSWORD** de `.env.local`, sin correo. Ese archivo contiene secretos, está ignorado por Git y no debe compartirse. Los datos de prueba se guardan en `.data/cine.sqlite`; no se envían a Supabase. El modo local solo atiende solicitudes de este equipo y se rechaza en Vercel.
@@ -32,7 +32,7 @@ npm run dev
 ## Comportamiento implementado
 
 - A01–K18: 11 filas, 9 asientos por bloque, pasillo entre 09 y 10.
-- **Sin límite adicional por reserva:** se pueden elegir hasta las 198 plazas si están disponibles.
+- **Máximo 4 entradas activas por nombre y función**, acumuladas entre reservas. Se ignoran mayúsculas, tildes y espacios repetidos. Las canceladas no cuentan; las ingresadas sí. La interfaz, API y PostgreSQL aplican el límite. Las reservas anteriores se conservan.
 - Reserva de varios asientos en una transacción; ante una colisión no se confirma parcialmente.
 - Idempotencia: reintentar la misma operación devuelve los mismos tickets.
 - Una reserva bloquea el asiento sin marcarlo pagado. No existen formularios ni integración de pago online.
@@ -41,14 +41,16 @@ npm run dev
 - Nombre y QR de terceros protegidos. La API pública devuelve solo función y butacas ocupadas.
 - Personal autenticado: verificar no consume el QR; al recibir el dinero se confirma pago e ingreso de forma atómica.
 - Segundo ingreso rechazado. Cancelación administrativa invalida el QR y libera la butaca; una entrada ya utilizada no se cancela.
+- El administrador puede seleccionar entradas de cualquier estado y eliminarlas definitivamente, o eliminar todas. Se retiran también sus pagos, ingresos, registros de auditoría y reservas que queden vacías. Los QR y enlaces privados sin entradas dejan de funcionar.
+- **Restablecer función** elimina todo lo anterior y vuelve a habilitar reservas conservando horario, aforo, precio y cuentas del equipo. El cierre por horario sigue vigente. Eliminar todas conserva el estado habilitado/pausado. Ambas acciones requieren escribir una confirmación; no se ejecutan al instalar la actualización.
 - Interfaz y PDF sin avisos de prueba; el proveedor local continúa separado de Supabase.
 - Fuentes servidas desde la aplicación, sin peticiones a Google Fonts.
 
 ## Conectar Supabase y Vercel
 
-**Estado actual:** el usuario confirmó que ya creó Supabase y desplegó en Vercel. Proyecto Supabase: https://supabase.com/dashboard/project/nporxpetsjhljqclvvjz. La revisión visual de INFOCINE se comprobó localmente; estos cambios todavía no se publicaron desde este chat. No requiere migración nueva ni cambios en las reservas existentes. Los pasos siguientes sirven como referencia de configuración.
+El proyecto ya está creado en Supabase y desplegado en Vercel. Esta actualización necesita ejecutar **`supabase/migrations/202610190001_limits_and_bulk_delete.sql`** en el SQL Editor del proyecto existente y publicar el código actualizado. La migración conserva las reservas actuales; instala el límite y la operación administrativa de borrado. Se puede repetir sin borrar datos.
 
-1. Crea un proyecto de Supabase en tu cuenta. Ejecuta `supabase/migrations/202610160001_cine.sql` una sola vez desde su SQL Editor. Está preparada para un proyecto nuevo.
+1. Solo para un proyecto nuevo: ejecuta primero `supabase/migrations/202610160001_cine.sql` una vez y después `supabase/migrations/202610190001_limits_and_bulk_delete.sql`. En el proyecto existente ejecuta únicamente la segunda migración.
 2. En Authentication, deshabilita el registro público y crea las cuentas del equipo. Copia sus UUID y asigna el rol en SQL:
 
 ```sql
@@ -81,7 +83,7 @@ La base de datos protege las tablas con RLS sin políticas de acceso público y 
 - **Cancelación:** solo administrador; no hay caducidad automática por falta de pago.
 - **Privacidad:** definir contacto institucional y plazo de conservación antes de usar nombres reales. La página actual declara que los datos permanecen hasta su eliminación por el organizador; no promete borrado automático.
 - **Doomsday:** no se añadió una afirmación editorial nueva sobre tráiler/poscréditos. El afiche original conserva el texto aportado; hay que unificarlo con el organizador.
-- **Identidad:** un nombre no acredita identidad. La decisión de no limitar por operación permite reservar todo el aforo en una petición. El limitador técnico admite 600 solicitudes por IP cada 10 minutos para no bloquear una red universitaria compartida; no equivale a una cuota por persona.
+- **Identidad:** el límite utiliza el nombre, porque el formulario no pide un identificador verificado. Cambiar de nombre permite eludirlo y dos personas con el mismo nombre comparten la cuota. Para un límite real por persona se necesita identificación adicional. El limitador técnico por IP no identifica personas.
 - **Conectividad:** la verificación es online. Si falla el servidor, la pantalla no registra un ingreso exitoso. No hay admisión offline.
 
 ## Verificar

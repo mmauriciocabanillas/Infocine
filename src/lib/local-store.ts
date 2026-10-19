@@ -2,7 +2,7 @@ import { DatabaseSync } from "node:sqlite";
 import { mkdirSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { randomBytes, randomUUID, createHash } from "node:crypto";
-import { AppError, INITIAL_EVENT, SEATS, type Booking, type FilmEvent, type ReserveInput, type Reservation, type Ticket, type AdminTicket } from "./domain";
+import { AppError, INITIAL_EVENT, MAX_SEATS_PER_PERSON, personKey, SEATS, ticketDeletionSchema, type TicketDeletion, type TicketDeletionResult, type Booking, type FilmEvent, type ReserveInput, type Reservation, type Ticket, type AdminTicket } from "./domain";
 
 export class LocalStore {
   db: DatabaseSync;
@@ -18,7 +18,10 @@ export class LocalStore {
       CREATE TABLE IF NOT EXISTS rate_limits(key TEXT PRIMARY KEY, count INTEGER NOT NULL, resets_at INTEGER NOT NULL);`);
     this.db.prepare("INSERT OR IGNORE INTO events VALUES (?,?)").run(INITIAL_EVENT.id, JSON.stringify(INITIAL_EVENT));
   }
-  event(): FilmEvent { return JSON.parse((this.db.prepare("SELECT data FROM events WHERE id=?").get(INITIAL_EVENT.id) as { data: string }).data); }
+  event(): FilmEvent {
+    const event: FilmEvent = JSON.parse((this.db.prepare("SELECT data FROM events WHERE id=?").get(INITIAL_EVENT.id) as { data: string }).data);
+    return { ...event, max_seats: Math.min(event.max_seats, MAX_SEATS_PER_PERSON) };
+  }
   occupied() { return (this.db.prepare("SELECT seat FROM tickets WHERE event_id=? AND status<>'cancelled'").all(INITIAL_EVENT.id) as { seat: string }[]).map(t=>t.seat); }
   booking(access: string): Booking {
     const r = this.db.prepare("SELECT * FROM reservations WHERE access_token=?").get(access) as Reservation | undefined;
@@ -35,9 +38,12 @@ export class LocalStore {
       }
       const event = this.event();
       if (!event.booking_open || new Date(event.closes_at).getTime() <= Date.now()) throw new AppError("CLOSED", "Las reservas de esta función están cerradas.", 409);
+      if (input.seats.length > MAX_SEATS_PER_PERSON) throw new AppError("SEAT_LIMIT", "Puedes reservar un máximo de 4 butacas.", 409);
       if (!input.seats.length || input.seats.length > event.max_seats || new Set(input.seats).size !== input.seats.length || input.seats.some(s=>!SEATS.includes(s))) throw new AppError("SEATS", "Selección de butacas no válida.");
       const occupied = new Set(this.occupied());
       if (input.seats.some(s => occupied.has(s))) throw new AppError("CONFLICT", "Alguien acaba de reservar una de tus butacas. Revisa el plano y elige de nuevo.", 409);
+      const alreadyReserved = this.dashboard().filter(t => t.status !== "cancelled" && personKey(t.name) === personKey(input.name)).length;
+      if (alreadyReserved + input.seats.length > MAX_SEATS_PER_PERSON) throw new AppError("PERSON_LIMIT", "Este nombre ya tiene entradas. El máximo es de 4 butacas en total.", 409);
       const r: Reservation = { id: randomUUID(), event_id: event.id, name: input.name, access_token: randomBytes(32).toString("hex"), request_id: input.requestId, fingerprint, created_at: new Date().toISOString() };
       this.db.prepare("INSERT INTO reservations VALUES (?,?,?,?,?,?,?)").run(r.id,r.event_id,r.name,r.access_token,r.request_id,r.fingerprint,r.created_at);
       const insert = this.db.prepare("INSERT INTO tickets VALUES (?,?,?,?,?,'reserved',?,NULL,NULL,NULL,NULL)");
@@ -67,6 +73,21 @@ export class LocalStore {
     } catch (error) { this.db.exec("ROLLBACK"); throw error; }
   }
   setOpen(open: boolean) { const event = { ...this.event(), booking_open: open }; this.db.prepare("UPDATE events SET data=? WHERE id=?").run(JSON.stringify(event),event.id); return event; }
+  deleteTickets(input: TicketDeletion): TicketDeletionResult {
+    const command = ticketDeletionSchema.parse(input);
+    this.db.exec("BEGIN IMMEDIATE");
+    try {
+      const ids = command.action === "delete" ? new Set(command.ids) : null;
+      const targets = this.dashboard().filter(ticket => !ids || ids.has(ticket.id));
+      const removeAudit = this.db.prepare("DELETE FROM audit WHERE ticket_id=?");
+      const removeTicket = this.db.prepare("DELETE FROM tickets WHERE id=? AND event_id=?");
+      for (const ticket of targets) { removeAudit.run(ticket.id); removeTicket.run(ticket.id, INITIAL_EVENT.id); }
+      const removed = this.db.prepare("DELETE FROM reservations WHERE event_id=? AND NOT EXISTS(SELECT 1 FROM tickets WHERE tickets.reservation_id=reservations.id)").run(INITIAL_EVENT.id);
+      if (command.action === "reset") this.setOpen(true);
+      this.db.exec("COMMIT");
+      return { deleted: targets.length, reservationsDeleted: Number(removed.changes) };
+    } catch (error) { this.db.exec("ROLLBACK"); throw error; }
+  }
   rateLimit(key: string, limit: number, seconds: number) {
     const now = Math.floor(Date.now()/1000);
     const row = this.db.prepare(`INSERT INTO rate_limits VALUES(?,1,?) ON CONFLICT(key) DO UPDATE SET count=CASE WHEN resets_at<=? THEN 1 ELSE count+1 END,resets_at=CASE WHEN resets_at<=? THEN excluded.resets_at ELSE resets_at END RETURNING count`).get(key,now+seconds,now,now) as {count:number};

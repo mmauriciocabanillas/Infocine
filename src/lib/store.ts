@@ -1,6 +1,6 @@
 import "server-only";
 import { createClient } from "@supabase/supabase-js";
-import { AppError, EVENT_ID, type AdminTicket, type Booking, type FilmEvent, type ReserveInput } from "./domain";
+import { AppError, EVENT_ID, type TicketDeletion, type TicketDeletionResult, type AdminTicket, type Booking, type FilmEvent, type ReserveInput } from "./domain";
 import { LocalStore, fingerprintFor } from "./local-store";
 
 export function backend(): "local" | "supabase" {
@@ -26,6 +26,9 @@ async function rpc<T>(name: string, args: Record<string, unknown> = {}): Promise
   if (error) {
     const messages: Record<string,[string,number]> = {
       CONFLICT:["Alguien acaba de reservar una de tus butacas. Revisa el plano y elige de nuevo.",409],
+      SEAT_LIMIT:["Puedes reservar un máximo de 4 butacas.",409],
+      PERSON_LIMIT:["Este nombre ya tiene entradas. El máximo es de 4 butacas en total.",409],
+      CONFIRMATION:["Escribe la confirmación para borrar las entradas.",400],
       CLOSED:["Las reservas de esta función están cerradas.",409],
       USED:["Esta entrada ya fue utilizada.",409], CANCELLED:["Esta entrada está cancelada.",409],
       NOT_FOUND:["No encontramos esas entradas. Revisa tu enlace privado.",404],
@@ -48,5 +51,8 @@ export const store = {
   async verify(token:string) { return backend()==="local" ? local().verify(token) : rpc<AdminTicket>("cine_verify",{p_event:EVENT_ID,p_token:token}); },
   async mutate(token:string,actor:string,action:"admit"|"cancel") { return backend()==="local" ? local().mutate(token,actor,action) : rpc<AdminTicket>("cine_ticket_action",{p_event:EVENT_ID,p_token:token,p_actor:actor,p_action:action}); },
   async setOpen(open:boolean,actor:string) { return backend()==="local" ? local().setOpen(open) : rpc<FilmEvent>("cine_set_open",{p_event:EVENT_ID,p_open:open,p_actor:actor}); },
+  async deleteTickets(input:TicketDeletion,actor:string) {
+    return backend()==="local" ? local().deleteTickets(input) : rpc<TicketDeletionResult>("cine_delete_tickets",{p_event:EVENT_ID,p_actor:actor,p_action:input.action,p_ids:input.action==="delete"?input.ids:null,p_confirmation:input.confirmation});
+  },
   async rateLimit(key:string,limit:number,seconds:number) { if(backend()==="local") return local().rateLimit(key,limit,seconds); await rpc("cine_rate_limit",{p_key:key,p_limit:limit,p_seconds:seconds}); }
 };

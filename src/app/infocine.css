@@ -333,4 +333,22 @@ td { color: #d0c5ad; }
 .ticket-filters button[aria-pressed="true"] { background: var(--text); color: #191915; border-color: var(--text); }
 .ticket-filters button span { font-variant-numeric: tabular-nums; opacity: .7; }
 .ticket-results { margin: 0 23px 18px; color: var(--muted); font-size: 11px; line-height: 1.6; }
+.ticket-selection-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; padding: 0 23px 18px; }
+.ticket-selection-actions > span { font-size: 12px; }
+.ticket-selection-actions .button, .admin-destructive-actions .button { min-height: 40px; padding: 9px 13px; font-size: 11px; }
+.danger-button { background: #471d19; border: 1px solid #a7584b; color: #ffe2d9; }
+.danger-button:hover:not(:disabled) { background: #61271f; }
+.ticket-checkbox { width: 48px; padding-right: 8px; }
+.ticket-checkbox input { width: 18px; height: 18px; margin: 0; accent-color: var(--gold); cursor: pointer; }
+.selected-ticket-row { background: #fbf1db0b; }
+.ticket-row-actions { display: flex; gap: 9px; }
+.ticket-action-message { margin: 0 23px 18px; }
+.admin-destructive-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; padding: 23px; border-top: 1px solid var(--line); }
+.admin-destructive-actions > div { flex: 1 1 250px; }
+.admin-destructive-actions h3 { font-size: 14px; }
+.admin-destructive-actions p { font-size: 11px; color: var(--muted); margin-top: 7px; line-height: 1.6; }
+.delete-tickets-dialog { max-height: 90dvh; overflow-y: auto; }
+.delete-tickets-dialog input { margin: 10px 0 20px; }
+.delete-dialog-buttons { display: flex; gap: 12px; }
 @media (max-width: 600px) { .ticket-filters { padding: 0 18px 18px; gap: 7px; } .ticket-filters button { font-size: 11px; padding: 9px 10px; } .ticket-results { margin: 0 18px 16px; } }
+@media (max-width: 600px) { .ticket-selection-actions { padding: 0 18px 18px; } .admin-destructive-actions { padding: 18px; } .delete-dialog-buttons { flex-direction: column; } }
